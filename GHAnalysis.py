@@ -6,6 +6,7 @@ class Data:
     def __init__(self, dict_address: int = None, reload: int = 0):
         if reload == 1:
             self.__init(dict_address)
+            return      #初始化完可以结束
         if dict_address is None and not os.path.exists('1.json') and not os.path.exists('2.json') and not os.path.exists('3.json'):
             raise RuntimeError('error: init failed')
         x = open('1.json', 'r', encoding='utf-8').read()
@@ -15,6 +16,7 @@ class Data:
         x = open('3.json', 'r', encoding='utf-8').read()
         self.__4Events4PerPPerR = json.loads(x)
 
+    #初始化
     def __init(self, dict_address: str):
         json_list = []
         for root, dic, files in os.walk(dict_address):
@@ -23,7 +25,7 @@ class Data:
                     json_path = f
                     x = open(dict_address+'\\'+json_path,
                              'r', encoding='utf-8').read()
-                    str_list = [_x for _x in x.split('\n') if len(_x) > 0]
+                    str_list = [_x for _x in x.split('\n') if len(_x) > 0]#要求是x属于line中以回车分割后的一个单词，数据长度大于0
                     for i, _str in enumerate(str_list):
                         try:
                             json_list.append(json.loads(_str))
@@ -33,6 +35,8 @@ class Data:
         self.__4Events4PerP = {}
         self.__4Events4PerR = {}
         self.__4Events4PerPPerR = {}
+
+        #根据指令进行分类，同时计数
         for i in records:
             if not self.__4Events4PerP.get(i['actor__login'], 0):
                 self.__4Events4PerP.update({i['actor__login']: {}})
@@ -71,6 +75,8 @@ class Data:
             records.append(_d)
         return records
 
+     
+    #分别是三条指令对应的取出数据的操作
     def getEventsUsers(self, username: str, event: str) -> int:
         if not self.__4Events4PerP.get(username,0):
             return 0
@@ -94,12 +100,13 @@ class Data:
 
 class Run:
     def __init__(self):
-        self.parser = argparse.ArgumentParser()
+        self.parser = argparse.ArgumentParser()     #创建一个解析对象
         self.data = None
         self.argInit()
         print(self.analyse())
 
-    def argInit(self):
+    #添加要关注的命令行参数和选项
+    def argInit(self):      
         self.parser.add_argument('-i', '--init')
         self.parser.add_argument('-u', '--user')
         self.parser.add_argument('-r', '--repo')
@@ -128,6 +135,5 @@ class Run:
             else:
                 raise RuntimeError('error: argument -e is required')
         return res
-
-
-a = Run()
+if __name__ == '__main__':
+    a = Run()
